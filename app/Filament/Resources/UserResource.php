@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\GenderTypeEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
@@ -55,18 +56,17 @@ class UserResource extends Resource
                             ->extraAttributes(['class' => 'dir-rtl']),
                         Forms\Components\Select::make('gender')
                             ->label('جنسیت')
-                            ->options([
-                                'male' => 'مرد',
-                                'female' => 'زن',
-                            ])
+                            ->options(collect(GenderTypeEnum::cases())
+                                ->mapWithKeys(fn($gender) => [$gender->value => $gender->getLabel()])
+                                ->toArray())
                             ->required(),
 
-                         Forms\Components\TextInput::make('password')
-                             ->label('رمز عبور')
-                             ->password()
-                             ->dehydrateStateUsing(fn ($state) => filled($state) ? Hash::make($state) : null)
-                             ->dehydrated(fn ($state) => filled($state))
-                             ->required(fn (string $context): bool => $context === 'create'),
+                        Forms\Components\TextInput::make('password')
+                            ->label('رمز عبور')
+                            ->password()
+                            ->dehydrateStateUsing(fn($state) => filled($state) ? Hash::make($state) : null)
+                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn(string $context): bool => $context === 'create'),
 
                     ])->columns(2),
             ]);
@@ -79,18 +79,23 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('نام')
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('family')
                     ->label('نام خانوادگی')
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('email')
                     ->label('ایمیل')
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('gender')
                     ->label('جنسیت')
-                    ->formatStateUsing(fn(string $state): string => $state === 'male' ? 'مرد' : 'زن'),
+                    ->formatStateUsing(fn(string $state): string => GenderTypeEnum::from($state)->getLabel()),
+
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('نقش')
                     ->formatStateUsing(fn($state) => $state === 'admin' ? 'مدیر' : 'کارمند'),
+
                 Tables\Columns\TextColumn::make('birthday')
                     ->label('تاریخ تولد')
                     ->jalaliDate('Y-m-d'),
@@ -121,7 +126,6 @@ class UserResource extends Resource
                 ]),
             ]);
     }
-
 
 
     public static function getRelations(): array

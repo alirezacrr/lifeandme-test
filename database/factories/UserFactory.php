@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\GenderTypeEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -26,14 +27,12 @@ class UserFactory extends Factory
         $firstNames = [
             'علی', 'محمد', 'رضا', 'حسین', 'مهدی', 'امیر', 'سعید', 'حسن', 'احمد', 'محسن',
         ];
-
         $lastNames = [
             'محمدی', 'احمدی', 'حسینی', 'رضایی', 'کریمی', 'موسوی', 'جعفری', 'صادقی', 'نجفی', 'علوی',
         ];
 
         $firstName = $this->faker->randomElement($firstNames);
         $lastName = $this->faker->randomElement($lastNames);
-
 
         return [
             'name' => $firstName,
@@ -43,7 +42,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'birthday' => $this->faker->dateTimeBetween('-40 years', '-20 years'),
-            'gender' => 'male',
+            'gender' => GenderTypeEnum::MALE->value,
         ];
     }
 
